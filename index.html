@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markwin Insights — production template</title>
+  <meta name="description" content="Markwin Style production-grade consulting report website template." />
+  <style>
+    :root {
+      --bg-main: #FFFFFF;
+      --bg-page: #F4F5F7;
+      --bg-sub: #F8F9FB;
+      --text-main: #1A1A1A;
+      --text-body: #444444;
+      --text-sub: #888888;
+      --border: rgba(0, 0, 0, 0.10);
+      --border-strong: rgba(0, 0, 0, 0.25);
+      --blue: #2563EB;
+      --teal: #0F766E;
+      --purple: #7C3AED;
+      --amber: #D97706;
+      --red: #DC2626;
+      --green: #16A34A;
+      --gray: #6B7280;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+      --sidebar-w: 260px;
+      --max-w: 1480px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; text-decoration: none; }
+    .app {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--bg-main);
+      border-right: 0.5px solid var(--border);
+      padding: 24px 20px 20px;
+      overflow-y: auto;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .brand-kicker {
+      font-size: 11px;
+      color: var(--text-sub);
+      letter-spacing: 0.04em;
+      text-transform: none;
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.5;
+    }
+    .controls {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .input, .select, .button {
+      width: 100%;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-main);
+      color: var(--text-body);
+      font: inherit;
+      font-size: 13px;
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .input:focus, .select:focus, .button:focus {
+      border-color: var(--border-strong);
+    }
+    .button {
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .button.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .nav-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin: 12px 0 8px;
+      letter-spacing: 0.04em;
+    }
+    .nav {
+      display: grid;
+      gap: 4px;
+    }
+    .nav a {
+      font-size: 13px;
+      color: var(--text-body);
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav a:hover, .nav a.active {
+      background: var(--bg-sub);
+      color: var(--text-main);
+    }
+    .meta-block {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      display: grid;
+      gap: 10px;
+    }
+    .meta-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+    .main {
+      padding: 28px;
+    }
+    .hero {
+      background: var(--bg-main);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .eyebrow {
+      font-size: 11px;
+      color: var(--text-sub);
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 500;
+      max-width: 860px;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-body);
+      max-width: 900px;
+    }
+    .tag-row, .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      white-space: nowrap;
+    }
+    .tag.gray { background: #F3F4F6; color: #4B5563; }
+    .tag.green { background: #F0FDF4; color: #15803D; }
+    .tag.amber { background: #FFFBEB; color: #92400E; }
+    .tag.purple { background: #F5F3FF; color: #6D28D9; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      background: var(--bg-sub);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .metric-label { font-size: 11px; color: var(--text-sub); }
+    .metric-value {
+      margin-top: 6px;
+      font-size: 22px;
+      line-height: 1.1;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    .metric-note { margin-top: 6px; font-size: 11px; color: var(--text-sub); }
+    .section {
+      margin-top: 24px;
+      display: grid;
+      gap: 12px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .section-subtitle {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.4;
+      max-width: 760px;
+    }
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 12px;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      background: var(--bg-main);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      min-width: 0;
+    }
+    .card.accent {
+      border-left: 3px solid var(--blue);
+      border-radius: 0 12px 12px 0;
+      padding-left: 18px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.35;
+      margin: 0 0 8px;
+    }
+    .card-body {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-body);
+    }
+    .mini-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .mini-item {
+      padding-top: 10px;
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      display: grid;
+      gap: 6px;
+    }
+    .mini-item:first-child { padding-top: 0; border-top: 0; }
+    .mini-label { font-size: 11px; color: var(--text-sub); }
+    .mini-value { font-size: 13px; color: var(--text-main); line-height: 1.5; }
+    .bar-list { display: grid; gap: 10px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) 58px;
+      gap: 10px;
+      align-items: center;
+    }
+    .bar-label { font-size: 13px; color: var(--text-main); }
+    .bar-track {
+      height: 6px;
+      background: #F0F0F0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .bar-value {
+      font-size: 12px;
+      color: var(--text-sub);
+      text-align: right;
+      font-family: var(--font-mono);
+    }
+    .bar-blue { background: var(--blue); }
+    .bar-teal { background: var(--teal); }
+    .bar-purple { background: var(--purple); }
+    .bar-amber { background: var(--amber); }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 16px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 6px;
+      bottom: 6px;
+      width: 0.5px;
+      background: rgba(0,0,0,0.10);
+    }
+    .timeline-item {
+      position: relative;
+      padding-left: 18px;
+      display: grid;
+      gap: 4px;
+    }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--bg-main);
+      border: 2px solid var(--blue);
+    }
+    .timeline-date { font-size: 11px; color: var(--text-sub); font-family: var(--font-mono); }
+    .timeline-title { font-size: 13px; color: var(--text-main); }
+    .timeline-copy { font-size: 12px; color: var(--text-body); line-height: 1.55; }
+    .table-wrap {
+      overflow-x: auto;
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-main);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+    }
+    thead th {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: left;
+      padding: 14px 16px;
+      background: var(--bg-sub);
+      border-bottom: 0.5px solid var(--border);
+    }
+    tbody td {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-body);
+      padding: 14px 16px;
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) td { background: #FBFBFC; }
+    .score {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+    .matrix {
+      display: grid;
+      grid-template-columns: 150px repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .matrix-head, .matrix-cell {
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--bg-main);
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text-body);
+    }
+    .matrix-head {
+      background: var(--bg-sub);
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    .matrix-row-title {
+      background: var(--bg-sub);
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    .footer {
+      margin-top: 28px;
+      padding: 16px 2px 0;
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 0.5px solid var(--border);
+      }
+      .main { padding: 20px; }
+      .metrics, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .hero, .card { padding: 16px; }
+      .main { padding: 12px; }
+      .hero-top, .section-header, .footer { flex-direction: column; align-items: flex-start; }
+      .metrics { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 90px minmax(0, 1fr) 48px; }
+      .matrix { grid-template-columns: 1fr; }
+      table { min-width: 620px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .sidebar, .controls { display: none; }
+      .app { display: block; max-width: none; }
+      .main { padding: 0; }
+      .hero, .card, .table-wrap { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-kicker">Markwin style · light premium</div>
+        <div class="brand-title">Consulting report website</div>
+        <div class="brand-subtitle">Production-ready HTML template for disease landscape, asset scan, competitive intelligence, and BD prioritization.</div>
+      </div>
+
+      <div class="controls">
+        <input id="searchInput" class="input" type="search" placeholder="Search sections, assets, or MoAs" />
+        <select id="focusFilter" class="select">
+          <option value="all">All focus areas</option>
+          <option value="landscape">Landscape</option>
+          <option value="pipeline">Pipeline</option>
+          <option value="bd">BD</option>
+          <option value="execution">Execution</option>
+        </select>
+        <div class="button-row">
+          <button class="button" onclick="window.print()">Export PDF</button>
+          <button class="button primary" onclick="downloadHtml()">Download HTML</button>
+        </div>
+      </div>
+
+      <div class="nav-label">Sections</div>
+      <nav class="nav" id="nav">
+        <a href="#overview" data-focus="landscape">Overview</a>
+        <a href="#priority" data-focus="landscape">Priority map</a>
+        <a href="#pipeline" data-focus="pipeline">Pipeline gap</a>
+        <a href="#bd" data-focus="bd">BD shortlist</a>
+        <a href="#decision" data-focus="execution">Decision matrix</a>
+      </nav>
+
+      <div class="meta-block">
+        <div class="meta-item"><span>Layout</span><span>single-file</span></div>
+        <div class="meta-item"><span>Theme</span><span>white / light gray</span></div>
+        <div class="meta-item"><span>Typography</span><span>400 / 500 only</span></div>
+        <div class="meta-item"><span>Deployment</span><span>GitHub Pages ready</span></div>
+      </div>
+    </aside>
+
+    <main class="main" id="mainContent">
+      <section class="hero searchable section-block" id="overview" data-focus="landscape" data-keywords="hematology landscape launch strategy report template mc kinsey novartis">
+        <div class="hero-top">
+          <div>
+            <div class="eyebrow">Production-ready website</div>
+            <h1>Institutional-grade visual template for strategy, CI, and business development workstreams</h1>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Markwin style</span>
+            <span class="tag gray">single HTML</span>
+            <span class="tag green">online deployable</span>
+          </div>
+        </div>
+        <p>
+          This site is built as a reusable consulting-report shell: white background, restrained color logic, 0.5px borders, structured hierarchy, and modular sections for KPI framing, prioritization, pipeline diagnosis, BD targeting, and execution planning. Replace the example content with any disease, asset class, market, or corporate strategy topic.
+        </p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Core modules</div>
+            <div class="metric-value">5</div>
+            <div class="metric-note">overview · ranking · gap · BD · decision</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Primary emphasis colors</div>
+            <div class="metric-value">3</div>
+            <div class="metric-note">blue · teal · purple</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Deployment mode</div>
+            <div class="metric-value">static</div>
+            <div class="metric-note">works on GitHub Pages / Vercel / Netlify</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Editing model</div>
+            <div class="metric-value">fast</div>
+            <div class="metric-note">single-file, no build step required</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-block searchable" id="priority" data-focus="landscape" data-keywords="priority map moa ranking opportunity assessment portfolio">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Priority map</div>
+            <div class="section-subtitle">Use this block to rank diseases, MoAs, or assets by attractiveness, strategic fit, and differentiation potential.</div>
+          </div>
+          <div class="filter-tags">
+            <span class="tag gray">ranking</span>
+            <span class="tag purple">portfolio fit</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <article class="card accent">
+            <h3 class="card-title">MoA prioritization snapshot</h3>
+            <div class="card-body">Example content below is placeholder strategy logic. Swap names, scores, and comments with your own live analysis.</div>
+            <div class="mini-list" style="margin-top:16px;">
+              <div class="bar-list">
+                <div class="bar-row"><div class="bar-label">Menin</div><div class="bar-track"><div class="bar-fill bar-blue" style="width:92%"></div></div><div class="bar-value">9.2</div></div>
+                <div class="bar-row"><div class="bar-label">IRAK4</div><div class="bar-track"><div class="bar-fill bar-teal" style="width:81%"></div></div><div class="bar-value">8.1</div></div>
+                <div class="bar-row"><div class="bar-label">Selective JAK2</div><div class="bar-track"><div class="bar-fill bar-purple" style="width:76%"></div></div><div class="bar-value">7.6</div></div>
+                <div class="bar-row"><div class="bar-label">BCL2 combo</div><div class="bar-track"><div class="bar-fill bar-amber" style="width:68%"></div></div><div class="bar-value">6.8</div></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3 class="card-title">Interpretation</h3>
+            <div class="mini-list">
+              <div class="mini-item">
+                <div class="mini-label">What rises to the top</div>
+                <div class="mini-value">Assets or MoAs with clear proof of biology, near- to mid-term commercial relevance, and white space against current standard of care.</div>
+              </div>
+              <div class="mini-item">
+                <div class="mini-label">What should be watched, not prioritized</div>
+                <div class="mini-value">Crowded classes with weak differentiation, early mechanisms lacking translational anchors, or assets with fragile strategic fit in China.</div>
+              </div>
+              <div class="mini-item">
+                <div class="mini-label">How to use this block</div>
+                <div class="mini-value">Keep to 4–7 items. More than that usually means the thesis is still too broad.</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-block searchable" id="pipeline" data-focus="pipeline" data-keywords="pipeline gap launch bridge timeline revenue hole">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Pipeline gap and launch bridge</div>
+            <div class="section-subtitle">Designed for franchise planning, loss-of-exclusivity risk framing, and launch sequencing logic.</div>
+          </div>
+          <div class="filter-tags">
+            <span class="tag gray">timeline</span>
+            <span class="tag amber">gap logic</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <h3 class="card-title">Franchise timeline</h3>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-date">2026–2027</div>
+                <div class="timeline-title">Base business anchors current revenue pool</div>
+                <div class="timeline-copy">Use this space to summarize currently marketed brands, near-term erosion risk, and whether growth is volume-driven, pricing-driven, or mix-driven.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-date">2027–2029</div>
+                <div class="timeline-title">Bridge window becomes strategically decisive</div>
+                <div class="timeline-copy">Highlight whether there is a launch desert, partial fill from line extension, or a genuine need for late-stage BD to avoid a revenue and relevance gap.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-date">2030+</div>
+                <div class="timeline-title">Late pipeline and platform expansion define the next franchise shape</div>
+                <div class="timeline-copy">Clarify whether the future is disease-led, MoA-led, or platform-led, and what capabilities must exist before that period arrives.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card accent">
+            <h3 class="card-title">Gap diagnosis</h3>
+            <div class="mini-list">
+              <div class="mini-item">
+                <div class="mini-label">Commercial gap</div>
+                <div class="mini-value">No clear mid-stage launches to offset erosion in the bridge years.</div>
+              </div>
+              <div class="mini-item">
+                <div class="mini-label">Strategic gap</div>
+                <div class="mini-value">Priority disease leadership lacks continuity from current market presence to future innovation wave.</div>
+              </div>
+              <div class="mini-item">
+                <div class="mini-label">Recommended action</div>
+                <div class="mini-value">Screen for late-stage or phase 2b / phase 3-ready external assets with China relevance and launchability inside the bridge window.</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-block searchable" id="bd" data-focus="bd" data-keywords="bd shortlist business development target asset licensing m&a partnership">
+        <div class="section-header">
+          <div>
+            <div class="section-title">BD shortlist</div>
+            <div class="section-subtitle">Use as a compact target table for licensing scans, partner discussions, and leadership readouts.</div>
+          </div>
+          <div class="filter-tags">
+            <span class="tag gray">table</span>
+            <span class="tag green">decision-ready</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset / company</th>
+                <th>Why it matters</th>
+                <th>Strategic fit</th>
+                <th>Watchpoint</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Asset A</strong><br><span class="tag">Phase 2</span></td>
+                <td>Addresses a defined SoC transition point with visible differentiation logic.</td>
+                <td>Strong China applicability and credible commercial bridge timing.</td>
+                <td>Need cleaner durability and safety readout.</td>
+                <td class="score">High</td>
+              </tr>
+              <tr>
+                <td><strong>Asset B</strong><br><span class="tag purple">First-in-class</span></td>
+                <td>High novelty and platform optionality, but commercial path still forming.</td>
+                <td>Better as strategic option value than as immediate revenue bridge.</td>
+                <td>Biology validated, positioning not yet proven.</td>
+                <td class="score">Medium</td>
+              </tr>
+              <tr>
+                <td><strong>Asset C</strong><br><span class="tag gray">Late-stage</span></td>
+                <td>Closer to launchability and easier internal storytelling.</td>
+                <td>Lower upside, but higher probability of filling a tactical gap.</td>
+                <td>Crowded class limits long-term ceiling.</td>
+                <td class="score">Medium-high</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section section-block searchable" id="decision" data-focus="execution" data-keywords="decision matrix recommendation next steps governance">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Decision matrix</div>
+            <div class="section-subtitle">A compact executive synthesis block. Useful for GM decks, steering committees, and franchise governance.</div>
+          </div>
+          <div class="filter-tags">
+            <span class="tag gray">recommendation</span>
+            <span class="tag amber">governance</span>
+          </div>
+        </div>
+
+        <div class="matrix">
+          <div class="matrix-head"></div>
+          <div class="matrix-head">Double down</div>
+          <div class="matrix-head">Monitor</div>
+          <div class="matrix-head">Deprioritize</div>
+
+          <div class="matrix-cell matrix-row-title">When to use</div>
+          <div class="matrix-cell">High unmet need, tractable biology, and credible path to strategic or commercial relevance.</div>
+          <div class="matrix-cell">Interesting mechanism or asset, but data package or fit is not yet mature enough.</div>
+          <div class="matrix-cell">Overcrowded, weakly differentiated, or poorly aligned with the target franchise thesis.</div>
+
+          <div class="matrix-cell matrix-row-title">Leadership message</div>
+          <div class="matrix-cell">This is where focused work should compound.</div>
+          <div class="matrix-cell">Stay informed without committing disproportionate resources.</div>
+          <div class="matrix-cell">Do not let optionality distract from priority choices.</div>
+
+          <div class="matrix-cell matrix-row-title">Typical next step</div>
+          <div class="matrix-cell">Deep-dive diligence, partner mapping, scenario valuation.</div>
+          <div class="matrix-cell">Quarterly tracking, selective expert input, wait for readout.</div>
+          <div class="matrix-cell">Archive, unless the external context materially changes.</div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Markwin style website template · production single-file build</div>
+        <div id="footerStatus">Ready for static hosting</div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const focusFilter = document.getElementById('focusFilter');
+    const sections = Array.from(document.querySelectorAll('.section-block'));
+    const navLinks = Array.from(document.querySelectorAll('#nav a'));
+    const footerStatus = document.getElementById('footerStatus');
+
+    function normalize(v) { return (v || '').toLowerCase().trim(); }
+
+    function updateVisibility() {
+      const q = normalize(searchInput.value);
+      const focus = focusFilter.value;
+      let visibleCount = 0;
+
+      sections.forEach(section => {
+        const text = normalize(section.innerText + ' ' + (section.dataset.keywords || ''));
+        const focusMatch = focus === 'all' || section.dataset.focus === focus;
+        const searchMatch = !q || text.includes(q);
+        const show = focusMatch && searchMatch;
+        section.classList.toggle('hidden', !show);
+        if (show) visibleCount += 1;
+      });
+
+      navLinks.forEach(link => {
+        const target = document.querySelector(link.getAttribute('href'));
+        const hidden = target.classList.contains('hidden');
+        link.classList.toggle('hidden', hidden);
+      });
+
+      footerStatus.textContent = visibleCount + ' section' + (visibleCount === 1 ? '' : 's') + ' visible';
+    }
+
+    function updateActiveNav() {
+      const offset = 120;
+      let activeId = '';
+      sections.filter(s => !s.classList.contains('hidden')).forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= offset && rect.bottom > offset) activeId = '#' + section.id;
+      });
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === activeId);
+      });
+    }
+
+    function downloadHtml() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'markwin-production-template.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    searchInput.addEventListener('input', updateVisibility);
+    focusFilter.addEventListener('change', updateVisibility);
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    updateVisibility();
+    updateActiveNav();
+  </script>
+</body>
+</html>
