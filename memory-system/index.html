@@ -1,373 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>大脑记忆系统｜3D Interactive Memory Atlas</title>
-  <meta name="description" content="一个可交互的 3D 大脑记忆机制网站：编码、注意、工作记忆、海马体索引、巩固、提取、再巩固与遗忘。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#f8f7f4; --surface:#fff; --surface-2:#f2f1ee; --border:#e4e2dd;
-      --text-primary:#1a1916; --text-secondary:#5a5750; --text-muted:#8a887f;
-      --blue:#2a5caa; --blue-light:#dbe8fb; --green:#2a6645; --green-light:#dff0e6;
-      --amber:#8a5c1a; --amber-light:#f5e4c8; --red:#b83232; --red-light:#f3d7d7;
-      --purple:#5a3a8a; --purple-light:#e5dcf4;
-      --shadow:0 14px 40px rgba(26,25,22,.07); --soft-shadow:0 8px 24px rgba(26,25,22,.06);
-      --radius:8px; --max:1200px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--text-primary);font-family:'DM Sans',system-ui,sans-serif;line-height:1.55;overflow-x:hidden}
-    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:
-      radial-gradient(circle at 15% 5%,rgba(42,92,170,.10),transparent 26%),
-      radial-gradient(circle at 90% 18%,rgba(90,58,138,.10),transparent 22%),
-      radial-gradient(circle at 50% 100%,rgba(42,102,69,.07),transparent 24%);z-index:-1}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-    .topbar{position:sticky;top:0;z-index:50;background:rgba(248,247,244,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-    .topbar .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:12px;letter-spacing:.08em;color:var(--text-secondary)}
-    .brand-mark{width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:linear-gradient(135deg,var(--surface),var(--surface-2));display:grid;place-items:center;box-shadow:var(--soft-shadow)}
-    .brand-mark::after{content:"μ";font-family:'EB Garamond',serif;font-size:19px;color:var(--blue)}
-    .nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .nav a,.chip,.control{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.06em;border:1px solid var(--border);background:rgba(255,255,255,.64);padding:8px 10px;border-radius:999px;color:var(--text-secondary);transition:.2s ease;cursor:pointer}
-    .nav a:hover,.chip:hover,.control:hover,.control.active{transform:translateY(-1px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.28);color:var(--blue);background:#fff}
-    .hero{padding:72px 0 34px}
-    .hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:18px;align-items:stretch}
-    .hero-copy,.panel,.card{background:rgba(255,255,255,.78);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .hero-copy{padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:590px}
-    .tag{width:max-content;background:var(--blue-light);color:var(--blue);border:1px solid rgba(42,92,170,.14);font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.08em;padding:7px 10px;border-radius:999px;margin-bottom:18px}
-    h1,h2,h3{font-family:'EB Garamond',serif;margin:0;color:var(--text-primary);letter-spacing:-.02em}
-    h1{font-size:clamp(44px,6vw,78px);line-height:.93;font-weight:700;max-width:850px}
-    .lead{font-size:19px;color:var(--text-secondary);max-width:700px;margin:24px 0 26px}
-    .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}
-    .stat{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-    .stat b{display:block;font-family:'EB Garamond',serif;font-size:38px;line-height:1;color:var(--text-primary)}
-    .stat span{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted)}
-    .brain-stage{position:relative;min-height:590px;overflow:hidden;background:linear-gradient(180deg,#fff,#f4f3ef);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    #brainCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
-    #brainCanvas:active{cursor:grabbing}
-    .stage-head{position:absolute;left:18px;top:18px;right:18px;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;pointer-events:none}
-    .stage-head .mini{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:999px;padding:7px 10px}
-    .tooltip{position:absolute;z-index:8;min-width:220px;max-width:300px;background:#1a1916;color:#fff;border-radius:10px;padding:12px 13px;box-shadow:0 20px 60px rgba(0,0,0,.22);transform:translate(-50%,-115%);display:none;pointer-events:none}
-    .tooltip strong{font-family:'EB Garamond',serif;font-size:22px;display:block;margin-bottom:2px}
-    .tooltip span{display:block;font-size:12px;color:rgba(255,255,255,.7)}
-    .stage-overlay{position:absolute;left:18px;right:18px;bottom:18px;z-index:6;display:grid;grid-template-columns:1fr;gap:10px}
-    .active-card{background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--soft-shadow)}
-    .active-card .eyebrow{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px}
-    .active-card h3{font-size:30px;margin-bottom:4px}
-    .active-card p{margin:0;color:var(--text-secondary);font-size:14px}
-    .stage-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .section{padding:46px 0}
-    .section-title{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:end;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}
-    .section-no{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:var(--text-muted)}
-    .section-title h2{font-size:42px;line-height:1}
-    .grid{display:grid;gap:16px}
-    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
-    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-    .grid.cols-4{grid-template-columns:repeat(4,1fr)}
-    .card{padding:20px;transition:.2s ease;position:relative;overflow:hidden}
-    .card:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(26,25,22,.09)}
-    .card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);opacity:.86}
-    .card.green::before{background:var(--green)}.card.amber::before{background:var(--amber)}.card.red::before{background:var(--red)}.card.purple::before{background:var(--purple)}
-    .kicker{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px}
-    .card h3{font-size:27px;line-height:1.05;margin-bottom:10px}
-    .card p{margin:0;color:var(--text-secondary);font-size:14px}
-    .card ul{margin:12px 0 0;padding-left:18px;color:var(--text-secondary);font-size:14px}
-    .card li{margin:5px 0}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
-    .brain-region-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-    .region-list{display:grid;grid-template-columns:1fr;gap:10px}
-    .region-button{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.2s ease;color:var(--text-primary);font-family:'DM Sans',sans-serif}
-    .region-button:hover,.region-button.active{transform:translateY(-2px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.28)}
-    .region-button b{font-family:'EB Garamond',serif;font-size:24px;display:block;line-height:1.05}
-    .region-button span{font-size:13px;color:var(--text-secondary)}
-    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative}
-    .flow-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;min-height:170px;position:relative;transition:.2s ease;cursor:pointer}
-    .flow-step:hover,.flow-step.active{transform:translateY(-3px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.30)}
-    .flow-step .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:.1em;margin-bottom:10px}
-    .flow-step h3{font-size:25px;margin-bottom:8px}
-    .flow-step p{font-size:13px;color:var(--text-secondary);margin:0}
-    .flow-step::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-family:'EB Garamond',serif;font-size:26px;z-index:2}
-    .flow-step:nth-child(4)::after,.flow-step:nth-child(8)::after{display:none}
-    .insight{background:#1a1916;color:#fff;border-radius:var(--radius);padding:34px;border:1px solid #1a1916;box-shadow:var(--shadow)}
-    .insight p{font-family:'EB Garamond',serif;font-size:31px;line-height:1.18;font-style:italic;margin:0;color:rgba(255,255,255,.94)}
-    .insight .by{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.52);margin-top:18px}
-    .matrix{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--soft-shadow)}
-    .cell{background:var(--surface);padding:15px;font-size:14px;color:var(--text-secondary)}
-    .cell.head{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:var(--text-primary);background:var(--surface-2)}
-    .cell b{color:var(--text-primary)}
-    .graph-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;min-height:430px;position:relative;overflow:hidden}
-    #knowledgeGraph{width:100%;height:420px;display:block}
-    .node-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;pointer-events:none}
-    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    .legend span{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);border:1px solid var(--border);border-radius:999px;padding:6px 9px;background:var(--surface)}
-    .footer{padding:44px 0 60px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.09em;text-align:center}
-    .fade{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}.fade.in{opacity:1;transform:none}
-    @media (max-width:900px){
-      .hero-grid,.grid.cols-2,.grid.cols-3,.grid.cols-4,.brain-region-grid,.flow{grid-template-columns:1fr}
-      .hero-copy,.brain-stage{min-height:auto}.brain-stage{height:560px}.hero-copy{padding:26px}
-      .stat-row{grid-template-columns:1fr}.nav{display:none}.section-title{grid-template-columns:1fr}.flow-step::after{display:none}.matrix{grid-template-columns:1fr}.cell.head:nth-child(n+2){display:none}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>大脑记忆系统｜Stable Interactive Memory Atlas</title>
+<meta name="description" content="稳定版大脑记忆机制交互网站：无外部 JS 依赖，GitHub Pages 可直接运行。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f7f4;--surface:#fff;--surface-2:#f2f1ee;--border:#e4e2dd;--text-primary:#1a1916;--text-secondary:#5a5750;--text-muted:#8a887f;--blue:#2a5caa;--blue-light:#dbe8fb;--green:#2a6645;--amber:#8a5c1a;--red:#b83232;--purple:#5a3a8a;--shadow:0 14px 40px rgba(26,25,22,.07);--soft-shadow:0 8px 24px rgba(26,25,22,.06);--radius:8px;--max:1200px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text-primary);font-family:'DM Sans',system-ui,sans-serif;line-height:1.55;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 5%,rgba(42,92,170,.10),transparent 26%),radial-gradient(circle at 90% 18%,rgba(90,58,138,.10),transparent 22%),radial-gradient(circle at 50% 100%,rgba(42,102,69,.07),transparent 24%);z-index:-1}a{color:inherit;text-decoration:none}.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}.topbar{position:sticky;top:0;z-index:50;background:rgba(248,247,244,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}.topbar .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:12px;letter-spacing:.08em;color:var(--text-secondary)}.brand-mark{width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:linear-gradient(135deg,var(--surface),var(--surface-2));display:grid;place-items:center;box-shadow:var(--soft-shadow)}.brand-mark:after{content:"μ";font-family:'EB Garamond',serif;font-size:19px;color:var(--blue)}.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.nav a,.chip,.control{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.06em;border:1px solid var(--border);background:rgba(255,255,255,.66);padding:8px 10px;border-radius:999px;color:var(--text-secondary);transition:.2s ease;cursor:pointer}.nav a:hover,.chip:hover,.control:hover,.control.active{transform:translateY(-1px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.28);color:var(--blue);background:#fff}.hero{padding:72px 0 34px}.hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:18px;align-items:stretch}.hero-copy,.card{background:rgba(255,255,255,.78);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}.hero-copy{padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:590px}.tag{width:max-content;background:var(--blue-light);color:var(--blue);border:1px solid rgba(42,92,170,.14);font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.08em;padding:7px 10px;border-radius:999px;margin-bottom:18px}h1,h2,h3{font-family:'EB Garamond',serif;margin:0;color:var(--text-primary);letter-spacing:-.02em}h1{font-size:clamp(44px,6vw,78px);line-height:.93;font-weight:700;max-width:850px}.lead{font-size:19px;color:var(--text-secondary);max-width:700px;margin:24px 0 26px}.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.stat{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}.stat b{display:block;font-family:'EB Garamond',serif;font-size:38px;line-height:1}.stat span{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted)}.brain-stage{position:relative;min-height:590px;overflow:hidden;background:linear-gradient(180deg,#fff,#f4f3ef);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}#brainCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}#brainCanvas:active{cursor:grabbing}.stage-head{position:absolute;left:18px;top:18px;right:18px;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;pointer-events:none}.mini{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:999px;padding:7px 10px}.stage-overlay{position:absolute;left:18px;right:18px;bottom:18px;z-index:6;display:grid;gap:10px}.active-card{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--soft-shadow)}.eyebrow{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px}.active-card h3{font-size:30px;margin-bottom:4px}.active-card p{margin:0;color:var(--text-secondary);font-size:14px}.stage-actions{display:flex;gap:8px;flex-wrap:wrap}.section{padding:46px 0}.section-title{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:end;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}.section-no{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:var(--text-muted)}.section-title h2{font-size:42px;line-height:1}.grid{display:grid;gap:16px}.cols-2{grid-template-columns:repeat(2,1fr)}.cols-3{grid-template-columns:repeat(3,1fr)}.cols-4{grid-template-columns:repeat(4,1fr)}.card{padding:20px;transition:.2s ease;position:relative;overflow:hidden}.card:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(26,25,22,.09)}.card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);opacity:.86}.card.green:before{background:var(--green)}.card.amber:before{background:var(--amber)}.card.red:before{background:var(--red)}.card.purple:before{background:var(--purple)}.kicker{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px}.card h3{font-size:27px;line-height:1.05;margin-bottom:10px}.card p,.card li{color:var(--text-secondary);font-size:14px}.card p{margin:0}.card ul{margin:12px 0 0;padding-left:18px}.card li{margin:5px 0}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.brain-region-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.region-list{display:grid;gap:10px}.region-button{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.2s ease;color:var(--text-primary);font-family:'DM Sans',sans-serif}.region-button:hover,.region-button.active{transform:translateY(-2px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.28)}.region-button b{font-family:'EB Garamond',serif;font-size:24px;display:block;line-height:1.05}.region-button span{font-size:13px;color:var(--text-secondary)}.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;min-height:170px;position:relative;transition:.2s ease;cursor:pointer}.flow-step:hover,.flow-step.active{transform:translateY(-3px);box-shadow:var(--soft-shadow);border-color:rgba(42,92,170,.30)}.flow-step .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:.1em;margin-bottom:10px}.flow-step h3{font-size:25px;margin-bottom:8px}.flow-step p{font-size:13px;color:var(--text-secondary);margin:0}.flow-step:after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-family:'EB Garamond',serif;font-size:26px;z-index:2}.flow-step:nth-child(4):after,.flow-step:nth-child(8):after{display:none}.insight{background:#1a1916;color:#fff;border-radius:var(--radius);padding:34px;border:1px solid #1a1916;box-shadow:var(--shadow)}.insight p{font-family:'EB Garamond',serif;font-size:31px;line-height:1.18;font-style:italic;margin:0;color:rgba(255,255,255,.94)}.insight .by{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.52);margin-top:18px}.matrix{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--soft-shadow)}.cell{background:var(--surface);padding:15px;font-size:14px;color:var(--text-secondary)}.cell.head{font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:var(--text-primary);background:var(--surface-2)}.cell b{color:var(--text-primary)}.graph-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;min-height:430px;position:relative;overflow:hidden}#knowledgeGraph{width:100%;height:420px;display:block}.node-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;pointer-events:none}.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.legend span{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);border:1px solid var(--border);border-radius:999px;padding:6px 9px;background:var(--surface)}.footer{padding:44px 0 60px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:10px;letter-spacing:.09em;text-align:center}.fade{opacity:1;transform:none}.fade.ready{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}.fade.ready.in{opacity:1;transform:none}@media(max-width:900px){.hero-grid,.cols-2,.cols-3,.cols-4,.brain-region-grid,.flow{grid-template-columns:1fr}.hero-copy,.brain-stage{min-height:auto}.brain-stage{height:560px}.hero-copy{padding:26px}.stat-row{grid-template-columns:1fr}.nav{display:none}.section-title{grid-template-columns:1fr}.flow-step:after{display:none}.matrix{grid-template-columns:1fr}.cell.head:nth-child(n+2){display:none}}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap">
-      <a class="brand" href="#top"><span class="brand-mark"></span><span>Memory Atlas</span></a>
-      <nav class="nav">
-        <a href="#atlas">3D Brain</a><a href="#lifecycle">Lifecycle</a><a href="#systems">Systems</a><a href="#schema">Schema</a><a href="#learn">Learning</a>
-      </nav>
-    </div>
-  </header>
-
-  <main id="top">
-    <section class="hero">
-      <div class="wrap hero-grid">
-        <div class="hero-copy fade">
-          <div>
-            <div class="tag">Interactive neuroscience map</div>
-            <h1>大脑记忆系统，不是硬盘，而是会自我重写的世界模型。</h1>
-            <p class="lead">这个网站把完整记忆体系拆成可交互模块：感觉输入、注意筛选、工作记忆、海马体索引、新皮层长期建模、情绪加权、技能自动化、睡眠巩固、提取再巩固与遗忘。</p>
-            <div class="controls">
-              <button class="control active" data-view="network">Network View</button>
-              <button class="control" data-view="consolidation">Consolidation</button>
-              <button class="control" data-view="emotion">Emotion Weighted</button>
-              <button class="control" data-view="skills">Skill Memory</button>
-            </div>
-          </div>
-          <div class="stat-row">
-            <div class="stat"><b>8</b><span>Core memory systems</span></div>
-            <div class="stat"><b>7</b><span>Memory lifecycle stages</span></div>
-            <div class="stat"><b>3D</b><span>Clickable brain atlas</span></div>
-          </div>
-        </div>
-        <div class="brain-stage fade" id="atlas">
-          <canvas id="brainCanvas" aria-label="3D brain memory atlas"></canvas>
-          <div class="stage-head">
-            <div class="mini">Drag to rotate · click regions</div>
-            <div class="mini" id="modeLabel">Mode: Network</div>
-          </div>
-          <div class="tooltip" id="tooltip"><strong></strong><span></span></div>
-          <div class="stage-overlay">
-            <div class="active-card" id="activeRegion">
-              <div class="eyebrow">Selected structure</div>
-              <h3>海马体 Hippocampus</h3>
-              <p>快速绑定新经验，建立情景索引；通过模式分离避免混淆，通过模式补全从线索召回整体。</p>
-            </div>
-            <div class="stage-actions" id="regionQuickActions"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="systems">
-      <div class="wrap">
-        <div class="section-title fade"><div class="section-no">01</div><h2>记忆不是一个仓库，而是一组协同系统</h2></div>
-        <div class="grid cols-4 fade">
-          <article class="card"><div class="kicker">Gateway</div><h3>感觉系统</h3><p>视觉、听觉、触觉与语言网络先把世界切成可处理的特征。</p></article>
-          <article class="card green"><div class="kicker">Control</div><h3>注意系统</h3><p>决定哪些信息值得进入工作台：新颖性、目标相关性、情绪强度。</p></article>
-          <article class="card amber"><div class="kicker">Workspace</div><h3>工作记忆</h3><p>前额叶与顶叶把信息短暂保持，并进行比较、推理、组合。</p></article>
-          <article class="card purple"><div class="kicker">Index</div><h3>海马体</h3><p>把时间、地点、人物、概念和情绪绑定成可召回的 episode。</p></article>
-        </div>
-        <div class="grid cols-4 fade" style="margin-top:16px">
-          <article class="card"><div class="kicker">World model</div><h3>新皮层</h3><p>慢速吸收、抽象、泛化，把具体经历转成长期语义知识。</p></article>
-          <article class="card red"><div class="kicker">Weighting</div><h3>杏仁核</h3><p>给恐惧、惊喜、奖赏和失败打权重，决定记忆优先级。</p></article>
-          <article class="card green"><div class="kicker">Policy</div><h3>基底节</h3><p>通过强化学习形成习惯，把高频行为变成自动化策略。</p></article>
-          <article class="card amber"><div class="kicker">Calibration</div><h3>小脑</h3><p>做误差校正、节律控制和精细协调，是技能流畅化的核心。</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="lifecycle">
-      <div class="wrap">
-        <div class="section-title fade"><div class="section-no">02</div><h2>一条新记忆的生命周期</h2></div>
-        <div class="flow fade" id="flowSteps"></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap brain-region-grid">
-        <div>
-          <div class="section-title fade"><div class="section-no">03</div><h2>点击一个脑区，看它在记忆体系中的角色</h2></div>
-          <div class="region-list fade" id="regionList"></div>
-        </div>
-        <div class="graph-panel fade">
-          <svg id="knowledgeGraph" viewBox="0 0 760 420" role="img" aria-label="memory system knowledge graph"></svg>
-          <div class="legend"><span>blue = executive control</span><span>purple = hippocampal index</span><span>green = cortical model</span><span>amber = skill loop</span><span>red = emotion</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="schema">
-      <div class="wrap">
-        <div class="section-title fade"><div class="section-no">04</div><h2>从 episode 到 knowledge：大脑如何把经历压缩成知识</h2></div>
-        <div class="grid cols-2 fade">
-          <div class="insight"><p>“真正的学习不是保存所有细节，而是把过去压缩成能指导未来的结构。”</p><div class="by">Memory as model-building</div></div>
-          <div class="matrix">
-            <div class="cell head">Layer</div><div class="cell head">Brain mechanism</div><div class="cell head">Learning implication</div>
-            <div class="cell"><b>Episode</b><br>我在哪里、什么时候、如何学到它</div><div class="cell">海马体快速绑定上下文</div><div class="cell">先保留具体例子，避免过早抽象</div>
-            <div class="cell"><b>Pattern</b><br>多个经历之间的共同结构</div><div class="cell">睡眠重放与新皮层慢速整合</div><div class="cell">反复调用、比较、归纳</div>
-            <div class="cell"><b>Schema</b><br>可迁移的知识框架</div><div class="cell">新皮层分布式长期表征</div><div class="cell">用框架吸收新知识，学习速度跃迁</div>
-            <div class="cell"><b>Policy</b><br>能自动执行的行为策略</div><div class="cell">基底节 + 小脑 + 运动皮层</div><div class="cell">通过练习、反馈和误差修正形成技能</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="learn">
-      <div class="wrap">
-        <div class="section-title fade"><div class="section-no">05</div><h2>把神经机制转成学习方法</h2></div>
-        <div class="grid cols-3 fade">
-          <article class="card purple"><div class="kicker">Pattern separation</div><h3>先切开相似概念</h3><p>学习深度来自差异辨认。每学一个新概念，问：它和相似概念的边界在哪里？</p><ul><li>ADC vs PDC vs RDC</li><li>工作记忆 vs 短期记忆</li><li>情景记忆 vs 语义记忆</li></ul></article>
-          <article class="card"><div class="kicker">Pattern completion</div><h3>用线索训练召回</h3><p>不要只重读。用一个关键词、一张图或一个问题，主动召回整套结构。</p><ul><li>闭卷复述</li><li>画机制图</li><li>用 3 个类比解释</li></ul></article>
-          <article class="card green"><div class="kicker">Systems consolidation</div><h3>让睡眠参与学习</h3><p>白天编码，夜间离线训练。间隔重复比单次狂刷更符合大脑机制。</p><ul><li>当天理解</li><li>隔天重构</li><li>一周后输出成 memo 或 slide</li></ul></article>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">Markwin Memory Atlas · Built as an interactive 3D knowledge visualization · GitHub Pages Ready</footer>
-
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/controls/OrbitControls.js';
-
-    const regions = [
-      {id:'hippocampus', name:'海马体', en:'Hippocampus', color:'#5a3a8a', pos:[-0.62,-0.16,0.30], scale:[.34,.12,.16], role:'快速绑定新经验，建立情景索引；通过模式分离避免混淆，通过模式补全从线索召回整体。', tag:'episodic index'},
-      {id:'pfc', name:'前额叶', en:'Prefrontal Cortex', color:'#2a5caa', pos:[0.74,0.30,0.52], scale:[.30,.22,.16], role:'注意控制、目标设定、工作记忆与主动提取；像认知系统的执行层。', tag:'executive control'},
-      {id:'neocortex', name:'新皮层', en:'Neocortex', color:'#2a6645', pos:[0.04,0.30,-0.03], scale:[.96,.46,.62], role:'长期知识库与世界模型；把多次经历慢慢抽象成语义知识和 schema。', tag:'long-term model'},
-      {id:'amygdala', name:'杏仁核', en:'Amygdala', color:'#b83232', pos:[-0.18,-0.22,0.44], scale:[.16,.12,.13], role:'情绪加权系统；恐惧、奖赏、惊喜和失败会提高记忆优先级。', tag:'emotional weight'},
-      {id:'basal', name:'基底节', en:'Basal Ganglia', color:'#8a5c1a', pos:[0.22,-0.17,0.16], scale:[.22,.14,.16], role:'习惯和强化学习系统；把高频选择变成自动化行为策略。', tag:'habit policy'},
-      {id:'cerebellum', name:'小脑', en:'Cerebellum', color:'#8a5c1a', pos:[-0.84,-0.36,-0.36], scale:[.32,.22,.20], role:'误差校正、动作时序和技能流畅化；让练习过的动作越来越省力。', tag:'error correction'},
-      {id:'thalamus', name:'丘脑', en:'Thalamus', color:'#2a5caa', pos:[0.04,-0.04,0.24], scale:[.16,.12,.14], role:'感觉与注意的中继枢纽；把输入路由到合适皮层网络。', tag:'routing hub'},
-      {id:'sensory', name:'感觉皮层', en:'Sensory Cortex', color:'#2a6645', pos:[-0.50,0.44,0.08], scale:[.32,.16,.18], role:'把视觉、听觉、触觉和语言输入编码为特征，是记忆形成的原材料。', tag:'feature coding'}
-    ];
-
-    const lifecycle = [
-      ['01','Encoding 编码','把外界输入转成多模态神经表征；记住的不是现实本身，而是被选择性压缩后的版本。'],
-      ['02','Attention 注意','入口阀门：新颖、重要、有情绪、与目标相关的信息更容易进入记忆系统。'],
-      ['03','Working Memory 工作记忆','前额叶把信息放上认知工作台，用来比较、推理、组合和决策。'],
-      ['04','Hippocampal Indexing 海马体索引','快速绑定时间、地点、人物、概念和情绪，形成可召回的 episode。'],
-      ['05','Pattern Separation 模式分离','把相似但不同的知识切开，避免新旧记忆互相污染。'],
-      ['06','Replay & Consolidation 重放与巩固','睡眠和休息中重放关键模式，让新皮层逐步吸收。'],
-      ['07','Retrieval 提取','回忆不是读取，而是在当前语境下重新激活并重建。'],
-      ['08','Reconsolidation & Forgetting 再巩固与遗忘','每次回忆都会轻微重写；遗忘则负责降噪、压缩与防止过拟合。']
-    ];
-
-    const canvas = document.getElementById('brainCanvas');
-    const stage = document.querySelector('.brain-stage');
-    const tooltip = document.getElementById('tooltip');
-    const activeRegion = document.getElementById('activeRegion');
-    const modeLabel = document.getElementById('modeLabel');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0.1, 0.35, 4.1);
-    const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = .42; controls.enablePan = false; controls.minDistance = 2.7; controls.maxDistance = 6.3;
-
-    scene.add(new THREE.AmbientLight(0xffffff, 1.25));
-    const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3,3,4); scene.add(key);
-    const rim = new THREE.DirectionalLight(0xdbe8fb, 1.1); rim.position.set(-3,2,-2); scene.add(rim);
-
-    const brainGroup = new THREE.Group(); scene.add(brainGroup);
-    const brainMat = new THREE.MeshPhysicalMaterial({color:0xffffff, roughness:.58, metalness:0, transparent:true, opacity:.34, transmission:.18, thickness:.8, clearcoat:.3});
-    const outer = new THREE.Mesh(new THREE.SphereGeometry(1.08,96,64), brainMat); outer.scale.set(1.18,.82,.70); outer.rotation.z = -.05; brainGroup.add(outer);
-    const leftLobe = new THREE.Mesh(new THREE.SphereGeometry(.62,64,32), brainMat); leftLobe.position.set(-.42,.10,.06); leftLobe.scale.set(1.06,.95,.78); brainGroup.add(leftLobe);
-    const rightLobe = new THREE.Mesh(new THREE.SphereGeometry(.62,64,32), brainMat); rightLobe.position.set(.42,.10,.06); rightLobe.scale.set(1.06,.95,.78); brainGroup.add(rightLobe);
-
-    const folds = new THREE.Group(); brainGroup.add(folds);
-    for(let i=0;i<34;i++){
-      const curve = new THREE.CatmullRomCurve3(Array.from({length:18},(_,j)=>{
-        const t = j/17 * Math.PI*2;
-        const x = Math.cos(t)*(0.78 + Math.sin(i*.7)*.08) + Math.sin(j*1.9+i)*.025;
-        const y = (i/33-.5)*1.08 + Math.sin(t*2+i)*.04;
-        const z = Math.sin(t)*.42 + Math.cos(i*.8)*.05;
-        return new THREE.Vector3(x,y,z);
-      }));
-      const tube = new THREE.Mesh(new THREE.TubeGeometry(curve,64,.0045,6,false), new THREE.MeshBasicMaterial({color:0xe4e2dd, transparent:true, opacity:.72}));
-      tube.scale.set(1.08,.66,.70); folds.add(tube);
-    }
-
-    const regionMeshes = new Map();
-    const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2(); let selected = 'hippocampus';
-    const labelSprites = [];
-    function makeTextSprite(text, color){
-      const c=document.createElement('canvas'); c.width=512; c.height=128; const ctx=c.getContext('2d');
-      ctx.clearRect(0,0,c.width,c.height); ctx.font='600 30px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.fillStyle=color; ctx.fillText(text,256,64);
-      const tex=new THREE.CanvasTexture(c); const mat=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:.82});
-      const sprite=new THREE.Sprite(mat); sprite.scale.set(.82,.20,1); return sprite;
-    }
-    regions.forEach(r=>{
-      const geo = new THREE.SphereGeometry(1,48,32);
-      const mat = new THREE.MeshStandardMaterial({color:r.color, roughness:.34, metalness:.04, transparent:true, opacity:.78, emissive:r.color, emissiveIntensity:.05});
-      const mesh = new THREE.Mesh(geo, mat); mesh.position.set(...r.pos); mesh.scale.set(...r.scale); mesh.userData = r; brainGroup.add(mesh); regionMeshes.set(r.id, mesh);
-      const halo = new THREE.Mesh(new THREE.SphereGeometry(1.03,48,32), new THREE.MeshBasicMaterial({color:r.color, transparent:true, opacity:.10, side:THREE.BackSide}));
-      halo.position.copy(mesh.position); halo.scale.copy(mesh.scale).multiplyScalar(1.22); brainGroup.add(halo);
-      const sprite = makeTextSprite(r.en, r.color); sprite.position.set(r.pos[0], r.pos[1]+r.scale[1]*1.8+.12, r.pos[2]); brainGroup.add(sprite); labelSprites.push(sprite);
-    });
-
-    const lineMat = new THREE.LineBasicMaterial({color:0x2a5caa, transparent:true, opacity:.20});
-    [['sensory','thalamus'],['thalamus','pfc'],['pfc','hippocampus'],['hippocampus','neocortex'],['amygdala','hippocampus'],['basal','pfc'],['cerebellum','basal'],['neocortex','pfc']].forEach(([a,b])=>{
-      const pa = regionMeshes.get(a).position, pb = regionMeshes.get(b).position;
-      const curve = new THREE.CatmullRomCurve3([pa.clone(), pa.clone().lerp(pb,.5).add(new THREE.Vector3(0,.18,.12)), pb.clone()]);
-      const pts = curve.getPoints(40); const geo = new THREE.BufferGeometry().setFromPoints(pts); const line = new THREE.Line(geo,lineMat); brainGroup.add(line);
-    });
-
-    function resize(){ const r=stage.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
-    window.addEventListener('resize',resize); resize();
-
-    function selectRegion(id, focus=true){
-      selected=id; const r=regions.find(x=>x.id===id); if(!r) return;
-      regionMeshes.forEach((m,k)=>{ m.material.opacity = k===id ? .98 : .48; m.material.emissiveIntensity = k===id ? .18 : .035; });
-      document.querySelectorAll('.region-button').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
-      activeRegion.innerHTML = `<div class="eyebrow">${r.tag}</div><h3>${r.name} ${r.en}</h3><p>${r.role}</p>`;
-      if(focus){ controls.target.set(r.pos[0]*.25,r.pos[1]*.25,r.pos[2]*.25); }
-    }
-
-    function onPointerMove(e){
-      const rect=canvas.getBoundingClientRect(); pointer.x=((e.clientX-rect.left)/rect.width)*2-1; pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
-      raycaster.setFromCamera(pointer,camera); const hits=raycaster.intersectObjects([...regionMeshes.values()]);
-      if(hits.length){ const r=hits[0].object.userData; tooltip.style.display='block'; tooltip.style.left=(e.clientX-rect.left)+'px'; tooltip.style.top=(e.clientY-rect.top)+'px'; tooltip.querySelector('strong').textContent=`${r.name} ${r.en}`; tooltip.querySelector('span').textContent=r.role; }
-      else tooltip.style.display='none';
-    }
-    function onClick(e){ raycaster.setFromCamera(pointer,camera); const hits=raycaster.intersectObjects([...regionMeshes.values()]); if(hits.length) selectRegion(hits[0].object.userData.id); }
-    canvas.addEventListener('pointermove',onPointerMove); canvas.addEventListener('click',onClick);
-
-    let tick=0; function animate(){ requestAnimationFrame(animate); tick+=.012; regionMeshes.forEach((m,k)=>{ const base= k===selected ? 1.06 : 1; const s=base + Math.sin(tick*3 + m.position.x*4)*.018; m.scale.set(m.userData.scale[0]*s,m.userData.scale[1]*s,m.userData.scale[2]*s); }); labelSprites.forEach(s=>s.quaternion.copy(camera.quaternion)); controls.update(); renderer.render(scene,camera); } animate(); selectRegion('hippocampus',false);
-
-    document.getElementById('regionList').innerHTML = regions.map(r=>`<button class="region-button ${r.id==='hippocampus'?'active':''}" data-id="${r.id}"><b>${r.name} ${r.en}</b><span>${r.tag} · ${r.role}</span></button>`).join('');
-    document.getElementById('regionQuickActions').innerHTML = regions.slice(0,5).map(r=>`<button class="chip" data-id="${r.id}">${r.en}</button>`).join('');
-    document.querySelectorAll('[data-id]').forEach(btn=>btn.addEventListener('click',()=>selectRegion(btn.dataset.id)));
-
-    document.getElementById('flowSteps').innerHTML = lifecycle.map((s,i)=>`<div class="flow-step ${i===3?'active':''}" data-step="${i}"><div class="num">${s[0]}</div><h3>${s[1]}</h3><p>${s[2]}</p></div>`).join('');
-    document.querySelectorAll('.flow-step').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.flow-step').forEach(x=>x.classList.remove('active')); el.classList.add('active'); const map=['sensory','pfc','pfc','hippocampus','hippocampus','neocortex','pfc','neocortex']; selectRegion(map[+el.dataset.step]||'hippocampus');}));
-
-    document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>{
-      document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-      const v=btn.dataset.view; modeLabel.textContent='Mode: '+btn.textContent;
-      const modeMap={network:['hippocampus','pfc','neocortex'],consolidation:['hippocampus','neocortex','sensory'],emotion:['amygdala','hippocampus','pfc'],skills:['basal','cerebellum','pfc']};
-      const targets=modeMap[v]; regionMeshes.forEach((m,k)=>{ m.material.opacity=targets.includes(k)?.95:.28; m.material.emissiveIntensity=targets.includes(k)?.16:.02; });
-      selectRegion(targets[0],false);
-    }));
-
-    function drawGraph(){
-      const svg=document.getElementById('knowledgeGraph'); const nodes=[
-        ['感觉输入',90,80,'#2a6645'],['注意筛选',255,70,'#2a5caa'],['工作记忆',425,75,'#2a5caa'],['海马体索引',590,86,'#5a3a8a'],['模式分离',500,200,'#5a3a8a'],['睡眠重放',640,238,'#5a3a8a'],['新皮层知识库',380,330,'#2a6645'],['杏仁核情绪权重',165,230,'#b83232'],['基底节/小脑技能环',255,330,'#8a5c1a']
-      ];
-      const edges=[[0,1],[1,2],[2,3],[3,4],[3,5],[5,6],[7,3],[8,2],[6,2],[6,3]];
-      svg.innerHTML='';
-      edges.forEach(([a,b])=>{const A=nodes[a],B=nodes[b]; const line=document.createElementNS('http://www.w3.org/2000/svg','path'); const mx=(A[1]+B[1])/2,my=(A[2]+B[2])/2-30; line.setAttribute('d',`M${A[1]} ${A[2]} Q${mx} ${my} ${B[1]} ${B[2]}`); line.setAttribute('fill','none'); line.setAttribute('stroke','#d7d4cc'); line.setAttribute('stroke-width','2'); svg.appendChild(line);});
-      nodes.forEach((n,i)=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.style.cursor='pointer'; g.innerHTML=`<circle cx="${n[1]}" cy="${n[2]}" r="38" fill="${n[3]}" opacity="0.14"></circle><circle cx="${n[1]}" cy="${n[2]}" r="23" fill="${n[3]}" opacity="0.86"></circle><text x="${n[1]}" y="${n[2]+60}" text-anchor="middle" class="node-label" fill="#5a5750">${n[0]}</text>`; svg.appendChild(g);});
-    } drawGraph();
-
-    const observer = new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); observer.unobserve(e.target); }}),{threshold:.12});
-    document.querySelectorAll('.fade').forEach((el,i)=>{el.style.transitionDelay=(i%5)*80+'ms'; observer.observe(el);});
-  </script>
+<header class="topbar"><div class="wrap"><a class="brand" href="#top"><span class="brand-mark"></span><span>Memory Atlas</span></a><nav class="nav"><a href="#atlas">3D Brain</a><a href="#lifecycle">Lifecycle</a><a href="#systems">Systems</a><a href="#schema">Schema</a><a href="#learn">Learning</a></nav></div></header>
+<main id="top">
+<section class="hero"><div class="wrap hero-grid"><div class="hero-copy fade"><div><div class="tag">Stable no-CDN JavaScript build</div><h1>大脑记忆系统，不是硬盘，而是会自我重写的世界模型。</h1><p class="lead">这个网站把完整记忆体系拆成可交互模块：感觉输入、注意筛选、工作记忆、海马体索引、新皮层长期建模、情绪加权、技能自动化、睡眠巩固、提取再巩固与遗忘。</p><div class="controls"><button class="control active" data-view="network">Network View</button><button class="control" data-view="consolidation">Consolidation</button><button class="control" data-view="emotion">Emotion Weighted</button><button class="control" data-view="skills">Skill Memory</button></div></div><div class="stat-row"><div class="stat"><b>8</b><span>Core memory systems</span></div><div class="stat"><b>7</b><span>Memory lifecycle stages</span></div><div class="stat"><b>0</b><span>External JS dependency</span></div></div></div><div class="brain-stage fade" id="atlas"><canvas id="brainCanvas" aria-label="3D-like brain memory atlas"></canvas><div class="stage-head"><div class="mini">Drag to rotate · click regions</div><div class="mini" id="modeLabel">Mode: Network</div></div><div class="stage-overlay"><div class="active-card" id="activeRegion"><div class="eyebrow">episodic index</div><h3>海马体 Hippocampus</h3><p>快速绑定新经验，建立情景索引；通过模式分离避免混淆，通过模式补全从线索召回整体。</p></div><div class="stage-actions" id="regionQuickActions"></div></div></div></div></section>
+<section class="section" id="systems"><div class="wrap"><div class="section-title fade"><div class="section-no">01</div><h2>记忆不是一个仓库，而是一组协同系统</h2></div><div class="grid cols-4 fade"><article class="card"><div class="kicker">Gateway</div><h3>感觉系统</h3><p>视觉、听觉、触觉与语言网络先把世界切成可处理的特征。</p></article><article class="card green"><div class="kicker">Control</div><h3>注意系统</h3><p>决定哪些信息值得进入工作台：新颖性、目标相关性、情绪强度。</p></article><article class="card amber"><div class="kicker">Workspace</div><h3>工作记忆</h3><p>前额叶与顶叶把信息短暂保持，并进行比较、推理、组合。</p></article><article class="card purple"><div class="kicker">Index</div><h3>海马体</h3><p>把时间、地点、人物、概念和情绪绑定成可召回的 episode。</p></article></div><div class="grid cols-4 fade" style="margin-top:16px"><article class="card"><div class="kicker">World model</div><h3>新皮层</h3><p>慢速吸收、抽象、泛化，把具体经历转成长期语义知识。</p></article><article class="card red"><div class="kicker">Weighting</div><h3>杏仁核</h3><p>给恐惧、惊喜、奖赏和失败打权重，决定记忆优先级。</p></article><article class="card green"><div class="kicker">Policy</div><h3>基底节</h3><p>通过强化学习形成习惯，把高频行为变成自动化策略。</p></article><article class="card amber"><div class="kicker">Calibration</div><h3>小脑</h3><p>做误差校正、节律控制和精细协调，是技能流畅化的核心。</p></article></div></div></section>
+<section class="section" id="lifecycle"><div class="wrap"><div class="section-title fade"><div class="section-no">02</div><h2>一条新记忆的生命周期</h2></div><div class="flow fade" id="flowSteps"></div></div></section>
+<section class="section"><div class="wrap brain-region-grid"><div><div class="section-title fade"><div class="section-no">03</div><h2>点击一个脑区，看它在记忆体系中的角色</h2></div><div class="region-list fade" id="regionList"></div></div><div class="graph-panel fade"><svg id="knowledgeGraph" viewBox="0 0 760 420" role="img" aria-label="memory system knowledge graph"></svg><div class="legend"><span>blue = executive control</span><span>purple = hippocampal index</span><span>green = cortical model</span><span>amber = skill loop</span><span>red = emotion</span></div></div></div></section>
+<section class="section" id="schema"><div class="wrap"><div class="section-title fade"><div class="section-no">04</div><h2>从 episode 到 knowledge：大脑如何把经历压缩成知识</h2></div><div class="grid cols-2 fade"><div class="insight"><p>“真正的学习不是保存所有细节，而是把过去压缩成能指导未来的结构。”</p><div class="by">Memory as model-building</div></div><div class="matrix"><div class="cell head">Layer</div><div class="cell head">Brain mechanism</div><div class="cell head">Learning implication</div><div class="cell"><b>Episode</b><br>我在哪里、什么时候、如何学到它</div><div class="cell">海马体快速绑定上下文</div><div class="cell">先保留具体例子，避免过早抽象</div><div class="cell"><b>Pattern</b><br>多个经历之间的共同结构</div><div class="cell">睡眠重放与新皮层慢速整合</div><div class="cell">反复调用、比较、归纳</div><div class="cell"><b>Schema</b><br>可迁移的知识框架</div><div class="cell">新皮层分布式长期表征</div><div class="cell">用框架吸收新知识，学习速度跃迁</div><div class="cell"><b>Policy</b><br>能自动执行的行为策略</div><div class="cell">基底节 + 小脑 + 运动皮层</div><div class="cell">通过练习、反馈和误差修正形成技能</div></div></div></div></section>
+<section class="section" id="learn"><div class="wrap"><div class="section-title fade"><div class="section-no">05</div><h2>把神经机制转成学习方法</h2></div><div class="grid cols-3 fade"><article class="card purple"><div class="kicker">Pattern separation</div><h3>先切开相似概念</h3><p>学习深度来自差异辨认。每学一个新概念，问：它和相似概念的边界在哪里？</p><ul><li>ADC vs PDC vs RDC</li><li>工作记忆 vs 短期记忆</li><li>情景记忆 vs 语义记忆</li></ul></article><article class="card"><div class="kicker">Pattern completion</div><h3>用线索训练召回</h3><p>不要只重读。用一个关键词、一张图或一个问题，主动召回整套结构。</p><ul><li>闭卷复述</li><li>画机制图</li><li>用 3 个类比解释</li></ul></article><article class="card green"><div class="kicker">Systems consolidation</div><h3>让睡眠参与学习</h3><p>白天编码，夜间离线训练。间隔重复比单次狂刷更符合大脑机制。</p><ul><li>当天理解</li><li>隔天重构</li><li>一周后输出成 memo 或 slide</li></ul></article></div></div></section>
+</main><footer class="footer">Markwin Memory Atlas · Stable GitHub Pages build · no external JavaScript</footer>
+<script>
+(function(){
+const regions=[{id:'hippocampus',name:'海马体',en:'Hippocampus',color:'#5a3a8a',x:-.45,y:.10,z:.40,s:.92,tag:'episodic index',role:'快速绑定新经验，建立情景索引；通过模式分离避免混淆，通过模式补全从线索召回整体。'},{id:'pfc',name:'前额叶',en:'Prefrontal Cortex',color:'#2a5caa',x:.63,y:-.28,z:.45,s:.88,tag:'executive control',role:'注意控制、目标设定、工作记忆与主动提取；像认知系统的执行层。'},{id:'neocortex',name:'新皮层',en:'Neocortex',color:'#2a6645',x:.02,y:-.02,z:-.20,s:1.55,tag:'long-term model',role:'长期知识库与世界模型；把多次经历慢慢抽象成语义知识和 schema。'},{id:'amygdala',name:'杏仁核',en:'Amygdala',color:'#b83232',x:-.15,y:.25,z:.62,s:.58,tag:'emotional weight',role:'情绪加权系统；恐惧、奖赏、惊喜和失败会提高记忆优先级。'},{id:'basal',name:'基底节',en:'Basal Ganglia',color:'#8a5c1a',x:.18,y:.22,z:.38,s:.66,tag:'habit policy',role:'习惯和强化学习系统；把高频选择变成自动化行为策略。'},{id:'cerebellum',name:'小脑',en:'Cerebellum',color:'#8a5c1a',x:-.72,y:.50,z:-.10,s:.75,tag:'error correction',role:'误差校正、动作时序和技能流畅化；让练习过的动作越来越省力。'},{id:'thalamus',name:'丘脑',en:'Thalamus',color:'#2a5caa',x:.04,y:.08,z:.52,s:.54,tag:'routing hub',role:'感觉与注意的中继枢纽；把输入路由到合适皮层网络。'},{id:'sensory',name:'感觉皮层',en:'Sensory Cortex',color:'#2a6645',x:-.48,y:-.35,z:.18,s:.72,tag:'feature coding',role:'把视觉、听觉、触觉和语言输入编码为特征，是记忆形成的原材料。'}];
+const lifecycle=[['01','Encoding 编码','把外界输入转成多模态神经表征；记住的不是现实本身，而是被选择性压缩后的版本。'],['02','Attention 注意','入口阀门：新颖、重要、有情绪、与目标相关的信息更容易进入记忆系统。'],['03','Working Memory 工作记忆','前额叶把信息放上认知工作台，用来比较、推理、组合和决策。'],['04','Hippocampal Indexing 海马体索引','快速绑定时间、地点、人物、概念和情绪，形成可召回的 episode。'],['05','Pattern Separation 模式分离','把相似但不同的知识切开，避免新旧记忆互相污染。'],['06','Replay & Consolidation 重放与巩固','睡眠和休息中重放关键模式，让新皮层逐步吸收。'],['07','Retrieval 提取','回忆不是读取，而是在当前语境下重新激活并重建。'],['08','Reconsolidation & Forgetting 再巩固与遗忘','每次回忆都会轻微重写；遗忘则负责降噪、压缩与防止过拟合。']];
+const canvas=document.getElementById('brainCanvas'),ctx=canvas.getContext('2d'),stage=document.querySelector('.brain-stage'),active=document.getElementById('activeRegion'),modeLabel=document.getElementById('modeLabel');let W=0,H=0,rot=.35,tilt=-.10,drag=false,lastX=0,lastY=0,selected='hippocampus',hover=null,mode='network';
+function resize(){const r=stage.getBoundingClientRect();W=Math.max(320,Math.floor(r.width));H=Math.max(420,Math.floor(r.height));const d=Math.min(devicePixelRatio||1,2);canvas.width=W*d;canvas.height=H*d;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(d,0,0,d,0,0)}window.addEventListener('resize',resize);resize();
+function project(p){let x=p.x,y=p.y,z=p.z;let cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt);let x1=x*cr-z*sr,z1=x*sr+z*cr;let y1=y*ct-z1*st,z2=y*st+z1*ct;let scale=210/(2.5-z2);return {x:W/2+x1*scale,y:H/2+y1*scale-20,z:z2,r:p.s*28*scale/95}}
+function pick(mx,my){let best=null,bd=1e9;regions.forEach(r=>{const p=project(r);const d=Math.hypot(mx-p.x,my-p.y);if(d<p.r+16&&d<bd){best=r;bd=d}});return best}
+function drawBrain(){ctx.clearRect(0,0,W,H);const cx=W/2,cy=H/2-20;let g=ctx.createRadialGradient(cx-90,cy-120,80,cx,cy,300);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(1,'rgba(228,226,221,.42)');ctx.fillStyle=g;ctx.strokeStyle='rgba(90,87,80,.18)';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(cx,cy,185,135,Math.sin(rot)*.10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(cx-58,cy+2,98,122,-.22+Math.sin(rot)*.08,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(cx+58,cy-2,98,122,.22+Math.sin(rot)*.08,0,Math.PI*2);ctx.fill();ctx.stroke();for(let i=0;i<34;i++){let yy=cy-105+i*6.5+Math.sin(i+rot*2)*5;ctx.beginPath();for(let t=0;t<=1;t+=.04){let x=cx-155+t*310;let y=yy+Math.sin(t*12+i*.8+rot*1.5)*8;let dx=(x-cx)/175,dy=(y-cy)/125;if(dx*dx+dy*dy<1){if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}}ctx.strokeStyle='rgba(138,136,127,.18)';ctx.lineWidth=1;ctx.stroke()}}
+function draw(){drawBrain();const activeIds={network:['hippocampus','pfc','neocortex'],consolidation:['hippocampus','neocortex','sensory'],emotion:['amygdala','hippocampus','pfc'],skills:['basal','cerebellum','pfc']}[mode];const pts={};regions.forEach(r=>pts[r.id]=project(r));[['sensory','thalamus'],['thalamus','pfc'],['pfc','hippocampus'],['hippocampus','neocortex'],['amygdala','hippocampus'],['basal','pfc'],['cerebellum','basal'],['neocortex','pfc']].forEach(e=>{let a=pts[e[0]],b=pts[e[1]];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo((a.x+b.x)/2,(a.y+b.y)/2-28,b.x,b.y);ctx.strokeStyle='rgba(42,92,170,.20)';ctx.lineWidth=2;ctx.stroke()});regions.slice().sort((a,b)=>pts[a.id].z-pts[b.id].z).forEach(r=>{let p=pts[r.id],on=activeIds.includes(r.id)||r.id===selected,sel=r.id===selected;ctx.beginPath();ctx.arc(p.x,p.y,p.r*(sel?1.18:1.04),0,Math.PI*2);ctx.fillStyle=r.color;ctx.globalAlpha=on?.18:.06;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(p.x,p.y,p.r*(sel?1.0:.82),0,Math.PI*2);ctx.fillStyle=r.color;ctx.globalAlpha=on?.88:.34;ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=sel?3:1.5;ctx.stroke();ctx.font='600 10px JetBrains Mono, monospace';ctx.textAlign='center';ctx.fillStyle='rgba(26,25,22,.72)';ctx.fillText(r.en.toUpperCase(),p.x,p.y+p.r+18)});requestAnimationFrame(draw)}draw();
+function select(id){selected=id;const r=regions.find(x=>x.id===id);if(!r)return;active.innerHTML='<div class="eyebrow">'+r.tag+'</div><h3>'+r.name+' '+r.en+'</h3><p>'+r.role+'</p>';document.querySelectorAll('[data-id]').forEach(b=>b.classList.toggle('active',b.dataset.id===id))}
+canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointerup',e=>{drag=false;let r=pick(e.offsetX,e.offsetY);if(r)select(r.id)});canvas.addEventListener('pointermove',e=>{if(drag){rot+=(e.clientX-lastX)*.008;tilt+=(e.clientY-lastY)*.006;tilt=Math.max(-.65,Math.min(.45,tilt));lastX=e.clientX;lastY=e.clientY}else{hover=pick(e.offsetX,e.offsetY);canvas.style.cursor=hover?'pointer':'grab'}});
+regionQuickActions.innerHTML=regions.slice(0,5).map(r=>'<button class="chip" data-id="'+r.id+'">'+r.en+'</button>').join('');regionList.innerHTML=regions.map(r=>'<button class="region-button '+(r.id===selected?'active':'')+'" data-id="'+r.id+'"><b>'+r.name+' '+r.en+'</b><span>'+r.tag+' · '+r.role+'</span></button>').join('');document.querySelectorAll('[data-id]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.id)));
+flowSteps.innerHTML=lifecycle.map((s,i)=>'<div class="flow-step '+(i===3?'active':'')+'" data-step="'+i+'"><div class="num">'+s[0]+'</div><h3>'+s[1]+'</h3><p>'+s[2]+'</p></div>').join('');document.querySelectorAll('.flow-step').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.flow-step').forEach(x=>x.classList.remove('active'));el.classList.add('active');select(['sensory','pfc','pfc','hippocampus','hippocampus','neocortex','pfc','neocortex'][+el.dataset.step])}));
+document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');mode=btn.dataset.view;modeLabel.textContent='Mode: '+btn.textContent;select({network:'hippocampus',consolidation:'hippocampus',emotion:'amygdala',skills:'basal'}[mode])}));
+function graph(){const svg=knowledgeGraph,n=[['感觉输入',90,80,'#2a6645'],['注意筛选',255,70,'#2a5caa'],['工作记忆',425,75,'#2a5caa'],['海马体索引',590,86,'#5a3a8a'],['模式分离',500,200,'#5a3a8a'],['睡眠重放',640,238,'#5a3a8a'],['新皮层知识库',380,330,'#2a6645'],['杏仁核情绪权重',165,230,'#b83232'],['基底节/小脑技能环',255,330,'#8a5c1a']],ed=[[0,1],[1,2],[2,3],[3,4],[3,5],[5,6],[7,3],[8,2],[6,2],[6,3]];svg.innerHTML='';ed.forEach(([a,b])=>{const A=n[a],B=n[b],p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+A[1]+' '+A[2]+' Q'+((A[1]+B[1])/2)+' '+((A[2]+B[2])/2-30)+' '+B[1]+' '+B[2]);p.setAttribute('fill','none');p.setAttribute('stroke','#d7d4cc');p.setAttribute('stroke-width','2');svg.appendChild(p)});n.forEach(x=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.innerHTML='<circle cx="'+x[1]+'" cy="'+x[2]+'" r="38" fill="'+x[3]+'" opacity="0.14"></circle><circle cx="'+x[1]+'" cy="'+x[2]+'" r="23" fill="'+x[3]+'" opacity="0.86"></circle><text x="'+x[1]+'" y="'+(x[2]+60)+'" text-anchor="middle" class="node-label" fill="#5a5750">'+x[0]+'</text>';svg.appendChild(g)})}graph();
+try{document.querySelectorAll('.fade').forEach(x=>x.classList.add('ready'));const ob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ob.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.fade').forEach((el,i)=>{el.style.transitionDelay=(i%5)*80+'ms';ob.observe(el)})}catch(e){}
+select('hippocampus');
+})();
+</script>
 </body>
 </html>
