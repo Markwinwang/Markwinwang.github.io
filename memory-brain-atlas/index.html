@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>记忆系统 3D 脑图谱</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1>记忆系统 3D 脑图谱</h1>
+        <p>从感觉输入、海马体索引到新皮层世界模型的交互式知识操作台</p>
+      </div>
+    </div>
+    <nav class="top-actions" aria-label="视图控制">
+      <button class="icon-button" id="replayBtn" type="button" title="启动睡眠重放">
+        <span aria-hidden="true">↻</span>
+        <span>重放</span>
+      </button>
+      <button class="icon-button" id="focusBtn" type="button" title="聚焦海马体">
+        <span aria-hidden="true">⌖</span>
+        <span>聚焦</span>
+      </button>
+      <button class="icon-button" id="resetBtn" type="button" title="重置视图">
+        <span aria-hidden="true">⟲</span>
+        <span>重置</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="脑区和记忆系统导航">
+      <section class="panel">
+        <div class="section-title">
+          <span></span>
+          <h2>脑区结构</h2>
+        </div>
+        <div class="region-list" id="regionList"></div>
+      </section>
+
+      <section class="panel compact">
+        <div class="section-title">
+          <span></span>
+          <h2>记忆类型</h2>
+        </div>
+        <div class="memory-tabs" id="memoryTabs"></div>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <div class="viewport-card">
+        <div class="canvas-head">
+          <div>
+            <p class="eyebrow">Interactive Brain Atlas</p>
+            <h2 id="activeTitle">海马体</h2>
+          </div>
+          <div class="canvas-status" id="canvasStatus">拖拽旋转 · 滚轮缩放 · 点击脑区</div>
+        </div>
+        <div class="brain-wrap">
+          <canvas id="brainCanvas" aria-label="可交互 3D 大脑模型"></canvas>
+          <div class="label-layer" id="labelLayer" aria-hidden="true"></div>
+          <div class="fallback" id="fallback3d">
+            <strong>3D 库正在加载</strong>
+            <span>如果网络阻止 Three.js 载入，仍可使用左侧导航和下方机制图。</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="journey-panel" aria-label="记忆生命周期">
+        <div class="section-title">
+          <span></span>
+          <h2>一条记忆的生命周期</h2>
+        </div>
+        <div class="journey-track" id="journeyTrack"></div>
+      </section>
+    </section>
+
+    <aside class="inspector" aria-label="机制解释面板">
+      <section class="panel detail-panel">
+        <p class="eyebrow" id="activeCategory">快速索引系统</p>
+        <h2 id="detailTitle">海马体 Hippocampus</h2>
+        <p id="detailSummary"></p>
+        <div class="detail-grid">
+          <div>
+            <span>核心功能</span>
+            <strong id="detailFunction"></strong>
+          </div>
+          <div>
+            <span>软件类比</span>
+            <strong id="detailAnalogy"></strong>
+          </div>
+        </div>
+        <div class="tags" id="detailTags"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <span></span>
+          <h2>机制链路</h2>
+        </div>
+        <div class="flow-map" id="flowMap"></div>
+      </section>
+
+      <section class="panel schema-panel">
+        <div class="section-title">
+          <span></span>
+          <h2>Schema 加速器</h2>
+        </div>
+        <p>选择一个已有框架，观察新知识如何更快归位。</p>
+        <div class="schema-controls" id="schemaControls"></div>
+        <div class="schema-output" id="schemaOutput"></div>
+      </section>
+    </aside>
+  </main>
+
+  <section class="lower-grid">
+    <article class="wide-panel">
+      <div class="section-title">
+        <span></span>
+        <h2>从事件到知识</h2>
+      </div>
+      <div class="knowledge-lane" id="knowledgeLane"></div>
+    </article>
+
+    <article class="wide-panel">
+      <div class="section-title">
+        <span></span>
+        <h2>大脑与 AI 系统类比</h2>
+      </div>
+      <div class="analogy-grid" id="analogyGrid"></div>
+    </article>
+  </section>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
